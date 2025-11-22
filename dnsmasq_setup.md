@@ -16,6 +16,31 @@
 
 This guide documents the complete setup of **dnsmasq** as a local DNS server for a PaaS (Platform as a Service) project called **Poddle**. The goal is to resolve custom domains like `*.poddle.uz` to local Kubernetes clusters running in KVM VMs.
 
+### Network Architecture Documentation
+
+                       Internet
+                           |
+                           v
+                     +-----------+
+                     |  enp2s0   |   (physical NIC)
+                     +-----------+
+                           |
+                           |
+                     +-----------+
+                     |   br0     |   (bridge interface)
+                     | 192.168.31.197  ← host IP
+                     +-----------+
+                   /       |        \
+                  /        |         \
+                 v         v          v
+        +--------------+  +--------------+   +----------------+
+        |    VM        |  |     VM       |   |      Host      |
+        |  k3s-server  |  |  k3s-agent   |   |     itself     |
+        +--------------+  +--------------+   +----------------+
+
+DNS flow:
+\*.poddle.uz → 192.168.31.207 (resolved by dnsmasq)
+
 ### Architecture
 
 ```
